@@ -1,0 +1,148 @@
+name: "global-trade-network"
+
+x-type: "hlfv1"
+x-loggingLevel: info
+
+description: "The network to be in if you want to stay in the global trade business"
+
+version: 1.0.0
+
+client:
+
+  organization: Org1
+
+  logging:
+    level: info
+
+  peer:
+    timeout:
+      connection: 10s
+      queryResponse: 45s
+      executeTxResponse: 30s
+  eventService:
+    timeout:
+      connection: 50s
+      registrationResponse: 50s
+  orderer:
+    timeout:
+      connection: 5s
+      response: 45s
+
+  cryptoconfig:
+    path: /opt/gopath/src/github.com/hyperledger/fabric
+
+  credentialStore:
+    path: "/tmp/hfc-kvs"
+
+    cryptoStore:
+      path: /tmp/msp
+
+    wallet: wallet-name
+
+  BCCSP:
+    security:
+     enabled: true
+     default:
+      provider: "SW"
+     hashAlgorithm: "SHA2"
+     softVerify: true
+     ephemeral: false
+     level: 256
+
+channels:
+  
+  mychannel:
+    orderers:
+      
+      - orderer0.example.com
+      
+    peers:
+      
+      peer0.org1.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      
+    chaincodes:
+      - chaincode:1.0
+  
+organizations:
+  
+  Org1:
+    mspid: Org1MSP
+
+    cryptoPath: D:/workspace/rootmodule/sdktest/src/main/resources/fixture/crypto-config-sw/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+    tlsCryptoKeyPath: D:/workspace/rootmodule/sdktest/src/main/resources/fixture/crypto-config-sw/peerOrganizations/org1.example.com/users/Admin@org1.example.com/tls/server.key
+    tlsCryptoCertPath: D:/workspace/rootmodule/sdktest/src/main/resources/fixture/crypto-config-sw/peerOrganizations/org1.example.com/users/Admin@org1.example.com/tls/server.crt
+
+    peers:
+      
+      - peer0.org1.example.com
+      
+    certificateAuthorities:
+      - ca-org1
+
+    adminPrivateKey:
+      pem: "-----BEGIN PRIVATE KEY----- <etc>"
+      path: D:/workspace/rootmodule/sdktest/src/main/resources/fixture/crypto-config-sw/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore/
+    signedCert:
+      path: D:/workspace/rootmodule/sdktest/src/main/resources/fixture/crypto-config-sw/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/signcerts/Admin@org1.example.com-cert.pem
+  
+#  ordererorg:
+#      mspID: "7c34ee52dd6d7dba54d31e8ae45c11023aadc560MSP"
+#
+#      cryptoPath: D:\crypto-config-sw\orderer\msp
+#orderer eip: 10.154.72.163
+orderers:
+  
+  orderer0.example.com:
+    url: grpcs://100.100.46.125:8050
+
+    grpcOptions:
+#      ssl-target-name-override: orderer-7c34ee52dd6d7dba54d31e8ae45c11023aadc560-0.orderer-7c34ee52dd6d7dba54d31e8ae45c11023aadc560.default.svc.cluster.local
+#      grpc-max-send-message-length: 15
+      sslProvider: openSSL
+      negotiationType: TLS
+      hostnameOverride: orderer0.example.com
+      grpc-max-send-message-length: 15
+
+    tlsCACerts:
+      path: D:/workspace/rootmodule/sdktest/src/main/resources/fixture/crypto-config-sw/ordererOrganizations/example.com/tlsca/tlsca.example.com-cert.pem
+  
+#peer eip: 10.154.72.163
+peers:
+  
+  peer0.org1.example.com:
+    url: grpcs://100.100.46.125:8051
+
+    eventUrl: grpcs://100.100.46.125:8053
+
+    grpcOptions:
+#      ssl-target-name-override: peer-d4334cdc475f0380866ade778521369e8b218ea5-0.peer-d4334cdc475f0380866ade778521369e8b218ea5.default.svc.cluster.local
+#      grpc.http2.keepalive_time: 15
+      ssl-target-name-override: peer0.org1.example.com
+      grpc.http2.keepalive_time: 15
+      negotiationType: TLS
+      sslProvider: openSSL
+      hostnameOverride: peer0.org1.example.com
+
+
+    tlsCACerts:
+      path: D:/workspace/rootmodule/sdktest/src/main/resources/fixture/crypto-config-sw/peerOrganizations/org1.example.com/users/Admin@org1.example.com/tls/ca.crt
+  
+certificateAuthorities:
+  ca-org1:
+    url: https://ca_peerOrg1:7054
+    httpOptions:
+      verify: true
+    tlsCACerts:
+      path: $GOPATH/src/github.com/hyperledger/fabric-sdk-go/test/api-server/tls/fabricca/certs/ca_root.pem
+      client:
+       keyfile: $GOPATH/src/github.com/hyperledger/fabric-sdk-go/test/api-server/tls/fabricca/certs/client/client_fabric_client-key.pem
+       certfile: $GOPATH/src/github.com/hyperledger/fabric-sdk-go/test/api-server/tls/fabricca/certs/client/client_fabric_client.pem
+
+    registrar:
+      enrollId: admin
+      enrollSecret: adminpw
+    caName: ca-org1
